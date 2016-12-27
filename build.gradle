@@ -1,0 +1,4 @@
+//
+// Main build file for Microbots framework
+apply plugin: "java"
+
