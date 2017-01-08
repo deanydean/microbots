@@ -1,4 +1,7 @@
 //
 // Main build file for Microbots framework
 apply plugin: "java"
+apply plugin: "maven"
 
+group = "org.oddcyb"
+version = "1.0.0-SNAPSHOT"
