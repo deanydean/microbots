@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Matt Dean
+ * Copyright 2016, 2017 Matt Dean
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,28 +42,34 @@ public class ClockWatcher
             usage();
             return;
         }
-        
+
+        // Create a scheduler and set the tick interval
         ScheduledExecutorService scheduler = 
             Executors.newSingleThreadScheduledExecutor();
         int tick = Integer.parseInt(args[0]);
-        
-        // Log the time on each tick
-        RobotFactory.reactor("tick", (s) -> System.out.println(s) );
-        
-        // Create a watcher robot that can trigger an event on each tick
-        RobotFactory.watcher( (cb) -> {
-            scheduler.scheduleAtFixedRate(
-                () -> cb.accept("tick"), tick, tick, TimeUnit.SECONDS);
-        } );
-        
-        // Wait for ~5 ticks and then shutdown the scheduler and the factory
+
+        // Create a countdown latch that counts down from 5
         CountDownLatch countDown = new CountDownLatch(5);
-        RobotFactory.reactor("tick", (s) -> countDown.countDown());
+        
+        // Create a robot that will log the time on each tick
+        RobotFactory.newReactor("tick", (s) -> System.out.println(s) );
+        
+        // Create a robot that will countdown the latch on each "tick"
+        RobotFactory.newReactor("tick", (s) -> countDown.countDown());
+        
+        // Create a robot that will wait until the countdown latch is open
+        // and then clean up the resources
         RobotFactory.activate( ()-> { countDown.await(); } )
             .activity().thenRun( () -> {
                 scheduler.shutdown();
                 RobotFactory.shutdown();
             });
+        
+        // Create a robot that will trigger an event on each tick
+        RobotFactory.newWatcher( (cb) -> {
+            scheduler.scheduleAtFixedRate(
+                () -> cb.accept("tick"), tick, tick, TimeUnit.SECONDS);
+        } );
     }
     
 }

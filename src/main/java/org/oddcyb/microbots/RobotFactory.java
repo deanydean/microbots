@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Matt Dean
+ * Copyright 2016, 2017 Matt Dean
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ public class RobotFactory
             Executors.newFixedThreadPool(2);
     
     /**
-     * Activate the provided robot.
+     * Activate a robot
      * @param robot the robot to activate
      * @return the activated robot
      */
@@ -42,7 +42,7 @@ public class RobotFactory
     }
     
     /**
-     * Create an active watcher robot.
+     * Create a new active watcher robot.
      * This method will block waiting for information supplied by the 
      * provided service.
      * 
@@ -50,13 +50,13 @@ public class RobotFactory
      * @param service the service to watch
      * @return ActiveRobot watching the supplied service
      */
-    public static <T> ActiveRobot watcher(Supplier<T> service)
+    public static <T> ActiveRobot newWatcher(Supplier<T> service)
     {
         return activate( () -> new Event<>(service.get()).send() );
     }
     
     /**
-     * Create an active watcher robot.
+     * Create a new active watcher robot.
      * This method will not block. The provided callback will be given a
      * consumer function that can be called when information is available.
      * 
@@ -64,13 +64,13 @@ public class RobotFactory
      * @param onService the service to watch
      * @return ActiveRobot watching the supplied service
      */
-    public static <T> ActiveRobot watcher(Consumer<Consumer<T>> onService)
+    public static <T> ActiveRobot newWatcher(Consumer<Consumer<T>> onService)
     {
         return activate( () -> onService.accept((t) -> new Event<>(t).send()) );
     }
     
     /**
-     * Create an active reactor robot.
+     * Create a new active reactor robot.
      * This method will not block. The provided action will be performed when
      * an event is triggered with the provided "on" object.
      * 
@@ -79,7 +79,7 @@ public class RobotFactory
      * @param action the action to take
      * @return ActiveRobot waiting to on
      */
-    public static <T> ActiveRobot reactor(T on, Action<T> action)
+    public static <T> ActiveRobot newReactor(T on, Action<T> action)
     {
         return activate( () -> { EventRegistry.register(on, action); } );
     }

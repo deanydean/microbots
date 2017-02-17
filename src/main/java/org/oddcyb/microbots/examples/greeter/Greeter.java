@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Matt Dean
+ * Copyright 2016, 2017 Matt Dean
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package org.oddcyb.microbots.examples.greeter;
 
 import java.util.Random;
-import org.oddcyb.microbots.ActiveRobot;
 import org.oddcyb.microbots.Robot;
 import org.oddcyb.microbots.RobotFactory;
 
@@ -53,10 +52,9 @@ public class Greeter
             System.out.println(greets[RNG.nextInt(greets.length)]+" "+args[0]);
         
         // Activate the robot using the robot factory
-        ActiveRobot activeGreeter = RobotFactory.activate(greeter);
-        
-        // Once the robot has completed it's activity, shutdown the factory
-        activeGreeter.activity().thenRun( () -> RobotFactory.shutdown() );
+        RobotFactory.activate(greeter)
+            // Once the robot has completed it's activity, shutdown the factory
+            .activity().thenRun( () -> RobotFactory.shutdown() );
     }
     
 }
