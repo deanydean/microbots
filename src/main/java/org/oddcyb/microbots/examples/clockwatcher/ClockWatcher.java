@@ -48,28 +48,27 @@ public class ClockWatcher
             Executors.newSingleThreadScheduledExecutor();
         int tick = Integer.parseInt(args[0]);
 
-        // Create a countdown latch that counts down from 5
-        CountDownLatch countDown = new CountDownLatch(5);
-        
         // Create a robot that will log the time on each tick
         RobotFactory.newReactor("tick", (s) -> System.out.println(s) );
-        
-        // Create a robot that will countdown the latch on each "tick"
-        RobotFactory.newReactor("tick", (s) -> countDown.countDown());
-        
-        // Create a robot that will wait until the countdown latch is open
-        // and then clean up the resources
-        RobotFactory.activate( ()-> { countDown.await(); } )
-            .activity().thenRun( () -> {
-                scheduler.shutdown();
-                RobotFactory.shutdown();
-            });
         
         // Create a robot that will trigger an event on each tick
         RobotFactory.newWatcher( (cb) -> {
             scheduler.scheduleAtFixedRate(
                 () -> cb.accept("tick"), tick, tick, TimeUnit.SECONDS);
         } );
+
+        // Create a countdown robot and a clean up robot that can deal with
+        // cleaning up this example after five ticks
+        CountDownLatch latch = new CountDownLatch(5);
+        RobotFactory.newReactor("tick", (s) -> latch.countDown());
+        RobotFactory.activate( ()-> { latch.await(); } )
+            .activity().thenRun( () -> {
+                // The count down has complete, clean up the resources
+                scheduler.shutdown();
+                RobotFactory.shutdown();
+            });
+        
+
     }
     
 }
