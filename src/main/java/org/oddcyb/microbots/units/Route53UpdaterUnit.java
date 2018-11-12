@@ -56,9 +56,10 @@ public class Route53UpdaterUnit implements Robot
     {
         // Create the change
         Collection<ResourceRecord> records = Arrays.asList(
-            new ResourceRecord(ip)
+            new ResourceRecord(this.ip)
         );
-        ResourceRecordSet recordSet = new ResourceRecordSet(host, RRType.A);
+        ResourceRecordSet recordSet = 
+            new ResourceRecordSet(this.host, RRType.A);
         recordSet.setTTL(300l);
         recordSet.setResourceRecords(records);
         List<Change> changes = Arrays.asList(
@@ -75,7 +76,7 @@ public class Route53UpdaterUnit implements Robot
         // Change the record
         ChangeResourceRecordSetsRequest changeRequest =
             new ChangeResourceRecordSetsRequest()
-                .withHostedZoneId(zone)
+                .withHostedZoneId(this.zone)
                 .withChangeBatch(batch);
         ChangeResourceRecordSetsResult changeResult =
             r53.changeResourceRecordSets(changeRequest);
