@@ -27,9 +27,9 @@ public interface Reactor<T>
     
     /**
      * When object occurs, perform action.
-     * @param object the object to react to
-     * @param action the action to take
+     * @param id to react to
+     * @param action to take
      */
-    public void on(T object, Action action);
+    public void on(String id, Action<T> action);
     
 }

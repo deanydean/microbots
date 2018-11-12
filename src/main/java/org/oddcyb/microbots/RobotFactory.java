@@ -18,6 +18,7 @@ package org.oddcyb.microbots;
 import org.oddcyb.microbots.core.AsyncActiveRobot;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -31,8 +32,12 @@ public class RobotFactory
     private static final ExecutorService EXECUTOR = 
             Executors.newFixedThreadPool(2);
     
+    private static final ScheduledExecutorService SCHEDULER = 
+            Executors.newScheduledThreadPool(2);
+    
     /**
-     * Activate a robot
+     * Activate a robot.
+     * 
      * @param robot the robot to activate
      * @return the activated robot
      */
@@ -43,30 +48,36 @@ public class RobotFactory
     
     /**
      * Create a new active watcher robot.
-     * This method will block waiting for information supplied by the 
-     * provided service.
+     * The robot will wait for information supplied by the provided service.
      * 
      * @param <T> the type of info provided by service
+     * @param id to send watch info to
      * @param service the service to watch
      * @return ActiveRobot watching the supplied service
      */
-    public static <T> ActiveRobot newWatcher(Supplier<T> service)
+    public static <T> ActiveRobot newWatcher(String id, Supplier<T> service)
     {
-        return activate( () -> new Event<>(service.get()).send() );
+        return activate( () -> new Event<>(id, service.get()).send() );
     }
     
     /**
      * Create a new active watcher robot.
-     * This method will not block. The provided callback will be given a
-     * consumer function that can be called when information is available.
+     * The provided callback will be given a consumer function that can be 
+     * called when information is available.
      * 
      * @param <T> the type of the info provided by the service
+     * @param id to send watch info to
      * @param onService the service to watch
      * @return ActiveRobot watching the supplied service
      */
-    public static <T> ActiveRobot newWatcher(Consumer<Consumer<T>> onService)
+    public static <T> ActiveRobot newWatcher(String id, 
+            Consumer<Consumer<T>> onService)
     {
-        return activate( () -> onService.accept((t) -> new Event<>(t).send()) );
+        return activate( () -> {
+            onService.accept( (t) -> {
+                new Event<>(id, t).send() ;
+            }); 
+        });
     }
     
     /**
@@ -75,18 +86,18 @@ public class RobotFactory
      * an event is triggered with the provided "on" object.
      * 
      * @param <T> the type of the info to on on
-     * @param on the object to on on
+     * @param id to act on
      * @param action the action to take
      * @return ActiveRobot waiting to on
      */
-    public static <T> ActiveRobot newReactor(T on, Action<T> action)
+    public static <T> ActiveRobot newReactor(String id, Action<T> action)
     {
-        return activate( () -> { EventRegistry.register(on, action); } );
+        return activate( () -> { EventRegistry.register(id, action); } );
     }
     
     /**
-     * Shutdown this RobotFactory.
-     * This method should be called when a RobotFactory should cease operation.
+     * Shutdown the RobotFactory.
+     * This method should be called when the RobotFactory should cease operation.
      */
     public static void shutdown()
     {

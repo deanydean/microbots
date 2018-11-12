@@ -32,7 +32,7 @@ public class EventRegistry implements Dispatcher, Reactor
 {   
     private static final EventRegistry REGISTRY = new EventRegistry();
     
-    private final ConcurrentMap<Object,Queue<Action>> register;
+    private final ConcurrentMap<String,Queue<Action>> register;
     
     /**
      * Create an EventRegistry.
@@ -49,12 +49,12 @@ public class EventRegistry implements Dispatcher, Reactor
      * @param action the action to take
      */
     @Override
-    public void on(Object object, Action action)
+    public void on(String id, Action action)
     {
         Queue<Action> registered = 
-            this.register.putIfAbsent(object, getEmptyQueue());
+            this.register.putIfAbsent(id, getEmptyQueue());
         
-        this.register.get(object).add(action);
+        this.register.get(id).add(action);
     }
     
     /**
@@ -65,8 +65,9 @@ public class EventRegistry implements Dispatcher, Reactor
     @Override
     public void dispatch(Event event)
     {
+        String id = event.getId();
         final Object object = event.getInfo();
-        this.register.get(object).forEach((action) -> action.perform(object));
+        this.register.get(id).forEach( (action) -> action.perform(object) );
     }
     
     /**
@@ -80,12 +81,12 @@ public class EventRegistry implements Dispatcher, Reactor
     
     /**
      * Register an action to be triggered on a given object.
-     * @param on the object to act on
+     * @param id to act on
      * @param action the action to take
      */
-    public static final void register(Object on, Action action)
+    public static final void register(String id, Action action)
     {
-        REGISTRY.on(on, action);
+        REGISTRY.on(id, action);
     }
     
     /**

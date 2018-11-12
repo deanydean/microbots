@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Matt Dean
+ * Copyright 2016, 2018, Matt Dean
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import org.oddcyb.microbots.core.dispatch.Dispatchers;
  */
 public class Event<T> 
 {
+    private final String id;
     private final T info;
     
     /**
@@ -30,8 +31,9 @@ public class Event<T>
      * 
      * @param info the info for the event
      */
-    public Event(T info)
+    public Event(String id, T info)
     {
+        this.id = id;
         this.info = info;
     }
     
@@ -43,6 +45,15 @@ public class Event<T>
     public T getInfo()
     {
         return this.info;
+    }
+    
+    /**
+     * 
+     * @return 
+     */
+    public String getId()
+    {
+        return this.id;
     }
   
     /**

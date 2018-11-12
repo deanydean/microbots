@@ -52,7 +52,7 @@ public class ClockWatcher
         RobotFactory.newReactor("tick", (s) -> System.out.println(s) );
         
         // Create a robot that will trigger an event on each tick
-        RobotFactory.newWatcher( (cb) -> {
+        RobotFactory.newWatcher( "tick", (cb) -> {                  
             scheduler.scheduleAtFixedRate(
                 () -> cb.accept("tick"), tick, tick, TimeUnit.SECONDS);
         } );
