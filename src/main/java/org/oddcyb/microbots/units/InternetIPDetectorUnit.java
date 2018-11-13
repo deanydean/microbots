@@ -77,7 +77,7 @@ public class InternetIPDetectorUnit implements Robot
         if ( matcher.matches() )
         {
             String ip = matcher.group("ip");
-            LOG.log(Level.INFO, "Found IP: {0}", ip);
+                LOG.log(Level.FINE, "Found IP: {0}", ip);
             this.onAddress.accept(InetAddress.getByName(ip));
         }
     }
