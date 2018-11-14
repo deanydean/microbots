@@ -54,7 +54,7 @@ public class AsyncActiveRobot implements ActiveRobot
                 }
                 catch(Exception e)
                 {
-                    LOG.log(Level.WARNING, "Robot failed : {0}", e);
+                    LOG.log(Level.WARNING, "Robot failed", e);
                 }
             },
             executor);
