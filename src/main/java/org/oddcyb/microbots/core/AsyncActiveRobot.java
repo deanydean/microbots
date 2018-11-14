@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Matt Dean
+ * Copyright 2018 Matt Dean
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ package org.oddcyb.microbots.core;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.oddcyb.microbots.ActiveRobot;
 import org.oddcyb.microbots.Robot;
 
@@ -25,6 +27,9 @@ import org.oddcyb.microbots.Robot;
  */
 public class AsyncActiveRobot implements ActiveRobot
 {
+    private static final Logger LOG = 
+        Logger.getLogger(AsyncActiveRobot.class.getName());
+    
     private final Robot robot;
     private final Executor executor;
     private final CompletableFuture activity;
@@ -49,7 +54,7 @@ public class AsyncActiveRobot implements ActiveRobot
                 }
                 catch(Exception e)
                 {
-                    // TODO logging
+                    LOG.log(Level.WARNING, "Robot failed : {0}", e);
                 }
             },
             executor);
