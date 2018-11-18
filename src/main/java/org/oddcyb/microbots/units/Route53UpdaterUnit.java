@@ -26,6 +26,7 @@ import com.amazonaws.services.route53.model.ChangeResourceRecordSetsResult;
 import com.amazonaws.services.route53.model.RRType;
 import com.amazonaws.services.route53.model.ResourceRecord;
 import com.amazonaws.services.route53.model.ResourceRecordSet;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -39,15 +40,15 @@ public class Route53UpdaterUnit implements Robot
     
     private final Regions region;
     private final String zone;
-    private final String host;
+    private final List<String> hosts;
     private final String ip;
     
-    public Route53UpdaterUnit(String region, String zone, String host, 
+    public Route53UpdaterUnit(String region, String zone, List<String> hosts, 
             String ip)
     {
         this.region = Regions.valueOf(region);
         this.zone = zone;
-        this.host = host;
+        this.hosts = hosts;
         this.ip = ip;
     }
 
@@ -58,13 +59,18 @@ public class Route53UpdaterUnit implements Robot
         Collection<ResourceRecord> records = Arrays.asList(
             new ResourceRecord(this.ip)
         );
-        ResourceRecordSet recordSet = 
-            new ResourceRecordSet(this.host, RRType.A);
-        recordSet.setTTL(300l);
-        recordSet.setResourceRecords(records);
-        List<Change> changes = Arrays.asList(
-            new Change(ChangeAction.UPSERT, recordSet)
-        );
+        
+        // Add each host to the changes
+        List<Change> changes = new ArrayList<>();
+        this.hosts.forEach( (host) -> {
+            ResourceRecordSet recordSet = 
+                new ResourceRecordSet(host, RRType.A);
+            recordSet.setTTL(300l);
+            recordSet.setResourceRecords(records);
+            changes.add(
+                new Change(ChangeAction.UPSERT, recordSet)
+            );
+        } );
         ChangeBatch batch = new ChangeBatch(changes);
 
         // Get a r53 client
