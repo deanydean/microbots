@@ -39,10 +39,10 @@ public class ClockWatcher
     
     public static void main(String[] args)
     {
-        if ( args.length < 1 )
+        if ( args.length != 1 )
         {
             usage();
-            return;
+            System.exit(1);
         }
 
         // Create a scheduler and set the tick interval

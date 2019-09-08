@@ -37,10 +37,10 @@ public class Greeter
 
     public static void main(String[] args)
     {
-        if ( args.length < 1 )
+        if ( args.length != 1 )
         {
             usage();
-            return;
+            System.exit(1);
         }
         
         // Create some greetings for our robot

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Matt Dean
+ * Copyright 2018, 2019 Matt Dean
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.oddcyb.microbots.units;
+package org.oddcyb.microbots.robots;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -34,10 +34,10 @@ import org.oddcyb.microbots.RobotException;
 /**
  * Robot that can find files.
  */
-public class FileFinderUnit extends SimpleFileVisitor<Path> implements Robot
+public class FileFinderRobot extends SimpleFileVisitor<Path> implements Robot
 {
     private static final Logger LOG =
-        Logger.getLogger(FileFinderUnit.class.getName());
+        Logger.getLogger(FileFinderRobot.class.getName());
 
     private final Set<Path> roots;
     private final BiConsumer<Path,BasicFileAttributes> onFile;
@@ -48,7 +48,7 @@ public class FileFinderUnit extends SimpleFileVisitor<Path> implements Robot
      * @param roots the filesystem roots to search
      * @param onFile called when a file is found
      */
-    public FileFinderUnit(Set<Path> roots, 
+    public FileFinderRobot(Set<Path> roots, 
             BiConsumer<Path,BasicFileAttributes> onFile)
     {
         this.roots = roots;

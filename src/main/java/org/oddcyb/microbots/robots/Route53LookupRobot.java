@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Matt Dean
+ * Copyright 2018, 2019 Matt Dean
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,64 +13,78 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.oddcyb.microbots.units;
+package org.oddcyb.microbots.robots;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.route53.AmazonRoute53;
 import com.amazonaws.services.route53.AmazonRoute53ClientBuilder;
 import com.amazonaws.services.route53.model.ListResourceRecordSetsRequest;
 import com.amazonaws.services.route53.model.ListResourceRecordSetsResult;
+import com.amazonaws.services.route53.model.ResourceRecordSet;
 
 import org.oddcyb.microbots.Robot;
 import org.oddcyb.microbots.RobotException;
 
 /**
- * Robot unit that can lookup an AWS Route53 host entry that need updating.
+ * Robot that can lookup an AWS Route53 host entry.
  */
-public class Route53UpdateDetectorUnit implements Robot
+public class Route53LookupRobot implements Robot
 {
     
     private final Regions region;
     private final String zone;
-    private final List<String> hosts;
-    private final String expectedIp;
-    private final Consumer<String> onResult;
+    private final List<String> entires;
+    private final Consumer<ResourceRecordSet> onResult;
     
-    public Route53UpdateDetectorUnit(String region, String zone, List<String> hosts,
-            String expectedIp, Consumer<String> onResult)
+    public Route53LookupRobot(String region, String zone, List<String> entires,
+                              Consumer<ResourceRecordSet> onResult)
     {
         this.region = Regions.valueOf(region);
         this.zone = zone;
-        this.hosts = hosts;
-        this.expectedIp = expectedIp;
+        this.entires = new ArrayList<>(entires);
         this.onResult = onResult;
     }
 
     @Override
     public void activate() throws RobotException
     {
+        getRecords().forEach( (record) -> {
+            onResult.accept(record);
+        });
+    }
+
+    /**
+     * Get the records for this robot's entries.
+     * 
+     * @return a list of the records
+     */
+    public List<ResourceRecordSet> getRecords()
+    {
         // Get a r53 client
         AmazonRoute53 r53 = AmazonRoute53ClientBuilder
             .standard()
             .withRegion(this.region)
             .build();
-        
+
         // Create the request
         ListResourceRecordSetsRequest request = 
             new ListResourceRecordSetsRequest()
                 .withHostedZoneId(zone);
-        
+
         // Get the result from AWS
         ListResourceRecordSetsResult result = 
             r53.listResourceRecordSets(request);
-        
-        // Look for host entries that do not match the expected ip
-        result.getResourceRecordSets().forEach( (record) -> {
-            
-        });
+
+        // Return the records that this robot will look for
+        return result.getResourceRecordSets()
+                     .stream()
+                     .filter( (r) -> this.entires.contains(r.getName()) )
+                     .collect(Collectors.toList());
     }
     
 }

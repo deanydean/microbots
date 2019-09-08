@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.oddcyb.microbots.units;
+package org.oddcyb.microbots.robots;
 
 import java.io.IOException;
 
@@ -23,7 +23,7 @@ import org.oddcyb.microbots.RobotException;
 /**
  * Robot that can issue commands.
  */
-public class CommandUnit implements Robot
+public class CommandRobot implements Robot
 {
 
     private final ProcessBuilder processBuilder;
@@ -33,7 +33,7 @@ public class CommandUnit implements Robot
      * 
      * @param command the command to issue.
      */
-    public CommandUnit(String... command)
+    public CommandRobot(String... command)
     {
         this.processBuilder = new ProcessBuilder(command);
     }
@@ -43,9 +43,9 @@ public class CommandUnit implements Robot
      * 
      * @param name the name of the environment variable
      * @param value the value of the environment variable
-     * @return this CommandUnit
+     * @return this CommandRobot
      */
-    public CommandUnit setEnv(String name, String value)
+    public CommandRobot setEnv(String name, String value)
     {
         this.processBuilder.environment().put(name, value);
         return this;
@@ -54,9 +54,9 @@ public class CommandUnit implements Robot
     /**
      * Inherit the current environment.
      * 
-     * @return this CommandUnit 
+     * @return this CommandRobot
      */
-    public CommandUnit inheritEnv()
+    public CommandRobot inheritEnv()
     {
         System.getenv().forEach( 
             ( k,v ) -> { this.processBuilder.environment().put(k, v); } );
@@ -73,15 +73,24 @@ public class CommandUnit implements Robot
     {
         try
         {
-            Process process = this.processBuilder.start();
-
-            // TODO - Deal with return code
-            process.waitFor();
+            this.runCommand();   
         }
         catch ( IOException | InterruptedException ie )
         {
             throw new RobotException("Failed to activate", ie);
         }
     }
-    
+
+    /**
+     * Run this robot's command.
+     * 
+     * @return the return code of the finished
+     * @throws IOException if something goes wrong
+     * @throws InterruptedException if waiting on the completion of the command
+     * is interrupted
+     */
+    public int runCommand() throws IOException, InterruptedException
+    {
+        return this.processBuilder.start().waitFor();
+    }
 }
