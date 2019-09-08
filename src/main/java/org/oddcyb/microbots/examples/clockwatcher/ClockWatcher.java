@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, 2017 Matt Dean
+ * Copyright 2016, 2019 Matt Dean
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,12 @@
  */
 package org.oddcyb.microbots.examples.clockwatcher;
 
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import org.oddcyb.microbots.RobotFactory;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.oddcyb.microbots.Robots;
 
 /**
  * Example of creating a robot that watches the clock tick.
@@ -49,26 +50,23 @@ public class ClockWatcher
         int tick = Integer.parseInt(args[0]);
 
         // Create a robot that will log the time on each tick
-        RobotFactory.newReactor("tick", (s) -> System.out.println(s) );
+        Robots.newReactor("tick", (s) -> System.out.println(s) );
         
         // Create a robot that will trigger an event on each tick
-        RobotFactory.newWatcher( "tick", (cb) -> {                  
+        Robots.newWatcher( "tick", (cb) -> {                  
             scheduler.scheduleAtFixedRate(
                 () -> cb.accept("tick"), tick, tick, TimeUnit.SECONDS);
         } );
 
-        // Create a countdown robot and a clean up robot that can deal with
-        // cleaning up this example after five ticks
-        CountDownLatch latch = new CountDownLatch(5);
-        RobotFactory.newReactor("tick", (s) -> latch.countDown());
-        RobotFactory.activate( ()-> { latch.await(); } )
-            .activity().thenRun( () -> {
-                // The count down has complete, clean up the resources
-                scheduler.shutdown();
-                RobotFactory.shutdown();
-            });
-        
-
+        // Finally create a robot that will count for 5 ticks and then clean
+        // up all resources
+        AtomicInteger numberOfTicks = new AtomicInteger(0);
+        Robots.newReactor("tick", (s) -> {
+            if ( numberOfTicks.incrementAndGet() > 5 )
+            {
+                scheduler.shutdownNow();
+            }
+        });
     }
     
 }

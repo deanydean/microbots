@@ -31,7 +31,6 @@ public class AsyncActiveRobot implements ActiveRobot
         Logger.getLogger(AsyncActiveRobot.class.getName());
     
     private final Robot robot;
-    private final Executor executor;
     private final CompletableFuture activity;
     
     /**
@@ -43,7 +42,6 @@ public class AsyncActiveRobot implements ActiveRobot
     public AsyncActiveRobot(Robot robot, Executor executor)
     {
         this.robot = robot;
-        this.executor = executor;
         
         // Create the activity for this robot
         this.activity = CompletableFuture.runAsync( 
