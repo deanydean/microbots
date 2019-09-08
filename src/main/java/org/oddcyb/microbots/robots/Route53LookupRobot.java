@@ -21,10 +21,8 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.amazonaws.regions.Regions;
-import com.amazonaws.services.route53.AmazonRoute53;
 import com.amazonaws.services.route53.AmazonRoute53ClientBuilder;
 import com.amazonaws.services.route53.model.ListResourceRecordSetsRequest;
-import com.amazonaws.services.route53.model.ListResourceRecordSetsResult;
 import com.amazonaws.services.route53.model.ResourceRecordSet;
 
 import org.oddcyb.microbots.Robot;

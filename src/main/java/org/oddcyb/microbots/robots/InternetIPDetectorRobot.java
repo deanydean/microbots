@@ -19,13 +19,20 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
+import java.net.URI;
 import java.net.URL;
-import java.net.URLConnection;
+import java.net.UnknownHostException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpClient.Version;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.oddcyb.microbots.Robot;
 import org.oddcyb.microbots.RobotException;
 
@@ -66,10 +73,15 @@ public class InternetIPDetectorRobot implements Robot
     public static final Pattern IP_EXTRACT_PATTERN = Pattern.compile(IP_EXTRACT_RE);
     
     private final Consumer<InetAddress> onAddress;
+    private final HttpRequest request;
     
     public InternetIPDetectorRobot(Consumer<InetAddress> onAddress)
     {
         this.onAddress = onAddress;
+        this.request = HttpRequest.newBuilder(URI.create(IP_DETECT_URL))
+                                  .version(Version.HTTP_1_1)
+                                  .GET()
+                                  .build();
     }
     
     @Override
@@ -77,12 +89,7 @@ public class InternetIPDetectorRobot implements Robot
     {
         try
         {           
-            var ip = getIP();
-
-            if ( ip != null )
-            {
-                this.onAddress.accept(ip);
-            }
+            getIP(this.onAddress);
         }
         catch ( IOException ie )
         {
@@ -96,33 +103,41 @@ public class InternetIPDetectorRobot implements Robot
      * @return the IP address
      * @throws IOException if something goes wrong
      */
-    public InetAddress getIP() throws IOException 
+    public void getIP(Consumer<InetAddress> onIP) throws IOException 
+    {        
+        HttpClient
+            .newHttpClient()
+            .sendAsync(this.request, BodyHandlers.ofString())
+            .thenApply(HttpResponse::body)
+            .thenApply( (body) -> ipDetectBodyToAddr(body) )
+            .thenAccept( (ip) -> onIP.accept(ip) );
+    }
+
+    /**
+     * Convert the body of the response from the IP detect URL to an InetAdress.
+     * 
+     * @param body the body of the response from the IP detect URL
+     * @return the InetAddress from the body, or null if none could be found
+     */
+    public static InetAddress ipDetectBodyToAddr(String body)
     {
-        // Use the URL connection
-        // TODO switch to newer HTTPClient class
-        var connection = new URL(IP_DETECT_URL).openConnection();
-        
-        // Read the content
-        var reader = new BufferedReader(
-            new InputStreamReader(connection.getInputStream()));
-        var content = new StringBuilder();
-        String line;
-        while ( (line = reader.readLine()) != null )
-        {
-            content.append(line);
-        }
-        LOG.log(Level.FINE, "Got DNS response {0}", content);
-    
-        // Split the IP out of the content
-        var matcher = IP_EXTRACT_PATTERN.matcher(content.toString());
+        var matcher = IP_EXTRACT_PATTERN.matcher(body);
         if ( !matcher.matches() )
         {
+            LOG.warning( () -> "No IP found in body: "+body);
             return null;
         }
 
         var ip = matcher.group("ip");
-        LOG.log(Level.FINE, "Found IP: {0}", ip);
-        return InetAddress.getByName(ip);
+
+        try
+        {
+            return InetAddress.getByName(ip);
+        }
+        catch ( UnknownHostException uhe )
+        {
+            LOG.warning( () -> "Cannot resolve "+ip );
+            return null;
+        }
     }
-  
 }

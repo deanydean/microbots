@@ -16,7 +16,7 @@
 package org.oddcyb.microbots;
 
 /**
- * 
+ * An exception thrown by the Microbots API.
  */
 public class RobotException extends Exception
 {

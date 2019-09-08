@@ -15,8 +15,11 @@
  */
 package org.oddcyb.microbots.robots;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import com.amazonaws.regions.Regions;
-import com.amazonaws.services.route53.AmazonRoute53;
 import com.amazonaws.services.route53.AmazonRoute53ClientBuilder;
 import com.amazonaws.services.route53.model.Change;
 import com.amazonaws.services.route53.model.ChangeAction;
@@ -26,11 +29,6 @@ import com.amazonaws.services.route53.model.ChangeResourceRecordSetsResult;
 import com.amazonaws.services.route53.model.RRType;
 import com.amazonaws.services.route53.model.ResourceRecord;
 import com.amazonaws.services.route53.model.ResourceRecordSet;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 import org.oddcyb.microbots.Robot;
 import org.oddcyb.microbots.RobotException;

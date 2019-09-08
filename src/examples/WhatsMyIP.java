@@ -14,25 +14,46 @@
  * limitations under the License.
  */
 
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.Phaser;
+
 import org.oddcyb.microbots.Robots;
 import org.oddcyb.microbots.robots.InternetIPDetectorRobot;
 
 /**
- * 
+ * Example of creating a robot that reports your IP address.
  */
 public class WhatsMyIP
 {
 
     public static void main(String[] args)
     {
+        // Create a basic barrier that can be passed when the output has 
+        // been displayed
+        var displayBarrier = new Phaser(2);
+
         // Create a robot that prints the IP to the screen.
         var detector = new InternetIPDetectorRobot( (ip) -> {
-            System.out.println("Your IP address is:");
-            System.out.println(ip.getHostAddress()+" ["+ip.getHostName()+"]");
+            if ( ip != null )
+            {
+                System.out.println("Your IP address is:");
+                System.out.println(
+                    ip.getHostAddress()+" ["+ip.getHostName()+"]");
+            }
+            else
+            {
+                System.err.println("Could not get IP address");
+            }
+
+            // Tell the barrier that we're done
+            displayBarrier.arriveAndAwaitAdvance();
         });
 
-        // Active the detector robot and wait for it to complete.
-        Robots.activate(detector).activity().join();
+        // Active the detector robot
+        Robots.activate(detector);
+
+        // Now wait for the display from the robot
+        displayBarrier.arriveAndAwaitAdvance();
     }
     
 }
