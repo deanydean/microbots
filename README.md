@@ -1,14 +1,22 @@
-Microbots - Tiny Framework for creating software robots
-=======================================================
+# Microbots - Tiny Framework for creating software robots
 
-Build
------
-To build you will need Java 8 + Gradle and need to run:
+## Build
+To build you will need Java 11 + Gradle and need to run:
 
+```
 $ gradle build
+```
 
-Install
--------
+## Install
 To install into your local Maven repository, run:
 
+```
 $ gradle install
+```
+
+## Running the Examples
+Once you've built the `microbots.jar`, you can run the examples like this:
+
+```
+$ java -cp ./build/lib/microbots.jar ./src/examples/<name-of-example>.java <args>
+```
