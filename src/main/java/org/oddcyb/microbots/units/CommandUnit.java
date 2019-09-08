@@ -15,7 +15,10 @@
  */
 package org.oddcyb.microbots.units;
 
+import java.io.IOException;
+
 import org.oddcyb.microbots.Robot;
+import org.oddcyb.microbots.RobotException;
 
 /**
  * Robot that can issue commands.
@@ -66,12 +69,19 @@ public class CommandUnit implements Robot
      * @throws Exception if the command execution failed. 
      */
     @Override
-    public void activate() throws Exception
+    public void activate() throws RobotException
     {
-        Process process = this.processBuilder.start();
-        
-        // TODO - Deal with return code
-        process.waitFor();
+        try
+        {
+            Process process = this.processBuilder.start();
+
+            // TODO - Deal with return code
+            process.waitFor();
+        }
+        catch ( IOException | InterruptedException ie )
+        {
+            throw new RobotException("Failed to activate", ie);
+        }
     }
     
 }

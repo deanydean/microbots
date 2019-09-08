@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Matt Dean
+ * Copyright 2019 Matt Dean
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,19 @@
 package org.oddcyb.microbots;
 
 /**
- * A robot that can do something.
+ * 
  */
-@FunctionalInterface
-public interface Robot 
+public class RobotException extends Exception
 {
-    
-    /**
-     * Active this robot.
-     * 
-     * @throws Exception if activating the robot failed. 
-     */
-    public void activate() throws RobotException;
 
+    public RobotException(String message)
+    {
+        super("RobotException: "+message);
+    }
+
+    public RobotException(String message, Throwable cause)
+    {
+        super("RobotException: "+message, cause);
+    }
+    
 }

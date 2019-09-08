@@ -29,6 +29,7 @@ import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.oddcyb.microbots.Robot;
+import org.oddcyb.microbots.RobotException;
 
 /**
  * Robot that can find files.
@@ -55,7 +56,7 @@ public class FileFinderUnit extends SimpleFileVisitor<Path> implements Robot
     }
     
     @Override
-    public void activate() throws Exception
+    public void activate() throws RobotException
     {
         LOG.log(Level.INFO, "Activating {0}", this);
         ExecutorService executor = Executors.newFixedThreadPool(4);
@@ -78,14 +79,23 @@ public class FileFinderUnit extends SimpleFileVisitor<Path> implements Robot
         }
         catch ( Exception e )
         {
-            LOG.log(Level.WARNING, "Failed to find dupes in {0} : {1}", 
+            LOG.log(Level.WARNING, "Failed to find file {0} : {1}", 
                 new Object[]{ this.roots, e });
-            throw e;
+            throw new RobotException("Error in file finder", e);
         }
         finally
         {
             executor.shutdown();
-            executor.awaitTermination(10, TimeUnit.MINUTES);
+
+            try
+            {
+                executor.awaitTermination(10, TimeUnit.MINUTES);
+            }
+            catch ( InterruptedException ie )
+            {
+                // Failed to wait for termination, terminal now
+                executor.shutdownNow();
+            }
         }
         
         LOG.log(Level.INFO, "Completed {0}", this);

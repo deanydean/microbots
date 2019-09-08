@@ -36,7 +36,7 @@ public class RobotFactory
     public RobotFactory()
     {
         this.executor = 
-            Executors.newFixedThreadPool(2, new RobotThreadFactory());
+            Executors.newCachedThreadPool(new RobotThreadFactory());
     }
 
     public RobotFactory(ExecutorService executors)

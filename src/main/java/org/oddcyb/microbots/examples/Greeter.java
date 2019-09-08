@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.oddcyb.microbots.examples.greeter;
+package org.oddcyb.microbots.examples;
 
 import java.util.Random;
 import org.oddcyb.microbots.Robot;
-import org.oddcyb.microbots.RobotFactory;
 import org.oddcyb.microbots.Robots;
 
 /**

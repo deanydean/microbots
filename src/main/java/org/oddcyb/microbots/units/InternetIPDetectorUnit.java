@@ -16,8 +16,10 @@
 package org.oddcyb.microbots.units;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.function.Consumer;
@@ -26,6 +28,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.oddcyb.microbots.Robot;
+import org.oddcyb.microbots.RobotException;
 
 /**
  * Robot unit that can detect the current IP from the point of view of the
@@ -55,30 +58,37 @@ public class InternetIPDetectorUnit implements Robot
     }
     
     @Override
-    public void activate() throws Exception
+    public void activate() throws RobotException
     {
-        // Use the URL connection
-        // TODO switch to newer HTTPClient class
-        URLConnection connection = new URL(DNS_DETECT_URL).openConnection();
-        
-        // Read the content
-        BufferedReader reader = new BufferedReader(
-            new InputStreamReader(connection.getInputStream()));
-        StringBuilder content = new StringBuilder();
-        String line;
-        while ( (line = reader.readLine()) != null )
+        try
         {
-            content.append(line);
+            // Use the URL connection
+            // TODO switch to newer HTTPClient class
+            URLConnection connection = new URL(DNS_DETECT_URL).openConnection();
+            
+            // Read the content
+            BufferedReader reader = new BufferedReader(
+                new InputStreamReader(connection.getInputStream()));
+            StringBuilder content = new StringBuilder();
+            String line;
+            while ( (line = reader.readLine()) != null )
+            {
+                content.append(line);
+            }
+            LOG.log(Level.FINE, "Got DNS response {0}", content);
+        
+            // Split the IP out of the content
+            Matcher matcher = IP_EXTRACTOR_RE.matcher(content.toString());
+            if ( matcher.matches() )
+            {
+                String ip = matcher.group("ip");
+                    LOG.log(Level.FINE, "Found IP: {0}", ip);
+                this.onAddress.accept(InetAddress.getByName(ip));
+            }
         }
-        LOG.log(Level.FINE, "Got DNS response {0}", content);
-        
-        // Split the IP out of the content
-        Matcher matcher = IP_EXTRACTOR_RE.matcher(content.toString());
-        if ( matcher.matches() )
+        catch ( IOException ie )
         {
-            String ip = matcher.group("ip");
-                LOG.log(Level.FINE, "Found IP: {0}", ip);
-            this.onAddress.accept(InetAddress.getByName(ip));
+            throw new RobotException("Detecting IP failed", ie);
         }
     }
   

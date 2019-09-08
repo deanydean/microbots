@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import org.oddcyb.microbots.Robot;
+import org.oddcyb.microbots.RobotException;
 
 /**
  * Robot unit that can update an AWS Route53 host entry.
@@ -53,7 +54,7 @@ public class Route53UpdaterUnit implements Robot
     }
 
     @Override
-    public void activate() throws Exception
+    public void activate() throws RobotException
     {
         // Create the change
         Collection<ResourceRecord> records = Arrays.asList(

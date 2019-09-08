@@ -25,6 +25,7 @@ import com.amazonaws.services.route53.model.ListResourceRecordSetsRequest;
 import com.amazonaws.services.route53.model.ListResourceRecordSetsResult;
 
 import org.oddcyb.microbots.Robot;
+import org.oddcyb.microbots.RobotException;
 
 /**
  * Robot unit that can lookup an AWS Route53 host entry that need updating.
@@ -49,7 +50,7 @@ public class Route53UpdateDetectorUnit implements Robot
     }
 
     @Override
-    public void activate() throws Exception
+    public void activate() throws RobotException
     {
         // Get a r53 client
         AmazonRoute53 r53 = AmazonRoute53ClientBuilder

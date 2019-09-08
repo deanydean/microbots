@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.oddcyb.microbots.examples.clockwatcher;
+package org.oddcyb.microbots.examples;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.oddcyb.microbots.ActiveRobot;
 import org.oddcyb.microbots.Robots;
 
 /**
@@ -55,18 +56,20 @@ public class ClockWatcher
         // Create a robot that will trigger an event on each tick
         Robots.newWatcher( "tick", (cb) -> {                  
             scheduler.scheduleAtFixedRate(
-                () -> cb.accept("tick"), tick, tick, TimeUnit.SECONDS);
+                () -> cb.accept("this is a tick"), tick, tick, TimeUnit.SECONDS);
         } );
 
-        // Finally create a robot that will count for 5 ticks and then clean
+        // Finally create a robot that will count 5 ticks and then clean
         // up all resources
         AtomicInteger numberOfTicks = new AtomicInteger(0);
-        Robots.newReactor("tick", (s) -> {
+        ActiveRobot cleanup = Robots.newReactor("tick", (s) -> {
             if ( numberOfTicks.incrementAndGet() > 5 )
             {
                 scheduler.shutdownNow();
             }
         });
+
+        cleanup.activity().join();
     }
     
 }
