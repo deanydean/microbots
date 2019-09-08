@@ -46,8 +46,7 @@ public class ClockWatcher
         }
 
         // Create a scheduler and set the tick interval
-        ScheduledExecutorService scheduler = 
-            Executors.newSingleThreadScheduledExecutor();
+        var scheduler = Executors.newSingleThreadScheduledExecutor();
         int tick = Integer.parseInt(args[0]);
 
         // Create a robot that will log the time on each tick
@@ -57,12 +56,12 @@ public class ClockWatcher
         Robots.newWatcher( "tick", (cb) -> {                  
             scheduler.scheduleAtFixedRate(
                 () -> cb.accept("this is a tick"), tick, tick, TimeUnit.SECONDS);
-        } );
+        } ).activity().join();
 
         // Finally create a robot that will count 5 ticks and then clean
         // up all resources
-        AtomicInteger numberOfTicks = new AtomicInteger(0);
-        ActiveRobot cleanup = Robots.newReactor("tick", (s) -> {
+        var numberOfTicks = new AtomicInteger(0);
+        var cleanup = Robots.newReactor("tick", (s) -> {
             if ( numberOfTicks.incrementAndGet() > 5 )
             {
                 scheduler.shutdownNow();

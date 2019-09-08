@@ -119,6 +119,7 @@ public class RobotFactory
         catch ( InterruptedException ie )
         {
             // Interrupted while waiting
+            this.executor.shutdownNow();
         }
     }
     

@@ -77,7 +77,7 @@ public class InternetIPDetectorRobot implements Robot
     {
         try
         {           
-            InetAddress ip = getIP();
+            var ip = getIP();
 
             if ( ip != null )
             {
@@ -100,12 +100,12 @@ public class InternetIPDetectorRobot implements Robot
     {
         // Use the URL connection
         // TODO switch to newer HTTPClient class
-        URLConnection connection = new URL(IP_DETECT_URL).openConnection();
+        var connection = new URL(IP_DETECT_URL).openConnection();
         
         // Read the content
-        BufferedReader reader = new BufferedReader(
+        var reader = new BufferedReader(
             new InputStreamReader(connection.getInputStream()));
-        StringBuilder content = new StringBuilder();
+        var content = new StringBuilder();
         String line;
         while ( (line = reader.readLine()) != null )
         {
@@ -114,15 +114,14 @@ public class InternetIPDetectorRobot implements Robot
         LOG.log(Level.FINE, "Got DNS response {0}", content);
     
         // Split the IP out of the content
-        Matcher matcher = IP_EXTRACT_PATTERN.matcher(content.toString());
+        var matcher = IP_EXTRACT_PATTERN.matcher(content.toString());
         if ( !matcher.matches() )
         {
             return null;
         }
 
-        String ip = matcher.group("ip");
+        var ip = matcher.group("ip");
         LOG.log(Level.FINE, "Found IP: {0}", ip);
-
         return InetAddress.getByName(ip);
     }
   

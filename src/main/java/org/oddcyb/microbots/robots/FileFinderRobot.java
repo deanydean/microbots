@@ -58,8 +58,9 @@ public class FileFinderRobot extends SimpleFileVisitor<Path> implements Robot
     @Override
     public void activate() throws RobotException
     {
-        LOG.log(Level.INFO, "Activating {0}", this);
-        ExecutorService executor = Executors.newFixedThreadPool(4);
+        LOG.log(Level.FINE, "Activating {0}", this);
+        var executor = Executors.newFixedThreadPool(4);
+
         try
         {
             roots.forEach((root) -> {

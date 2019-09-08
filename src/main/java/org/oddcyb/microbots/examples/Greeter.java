@@ -44,8 +44,7 @@ public class Greeter
         }
         
         // Create some greetings for our robot
-        String[] greets = 
-            new String[] { "Hello", "Hi", "Hey", "Howdy", "Hej"};
+        var greets = new String[] { "Hello", "Hi", "Hey", "Howdy", "Hej"};
    
         // Create a robot that will greet
         Robot greeter = () ->

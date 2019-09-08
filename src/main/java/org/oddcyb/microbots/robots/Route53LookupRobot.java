@@ -66,19 +66,17 @@ public class Route53LookupRobot implements Robot
     public List<ResourceRecordSet> getRecords()
     {
         // Get a r53 client
-        AmazonRoute53 r53 = AmazonRoute53ClientBuilder
+        var r53 = AmazonRoute53ClientBuilder
             .standard()
             .withRegion(this.region)
             .build();
 
         // Create the request
-        ListResourceRecordSetsRequest request = 
-            new ListResourceRecordSetsRequest()
-                .withHostedZoneId(zone);
+        var request = new ListResourceRecordSetsRequest()
+                            .withHostedZoneId(zone);
 
         // Get the result from AWS
-        ListResourceRecordSetsResult result = 
-            r53.listResourceRecordSets(request);
+        var result = r53.listResourceRecordSets(request);
 
         // Return the records that this robot will look for
         return result.getResourceRecordSets()

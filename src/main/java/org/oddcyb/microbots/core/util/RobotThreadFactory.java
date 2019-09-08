@@ -13,8 +13,8 @@ public class RobotThreadFactory implements ThreadFactory
     @Override
     public Thread newThread(Runnable runnable)
     {
-        Thread thread =
-            new Thread(runnable, "Robot-thread-"+tCount.incrementAndGet());
+        var thread = new Thread(runnable, 
+                                "Robot-thread-"+tCount.incrementAndGet());
         thread.setDaemon(true);
         thread.setUncaughtExceptionHandler(new RobotUncaughtExceptionHandler());
         return thread;

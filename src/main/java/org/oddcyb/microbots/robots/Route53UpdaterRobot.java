@@ -60,12 +60,12 @@ public class Route53UpdaterRobot implements Robot
         this.zone = zone;
 
         // Create the change
-        Collection<ResourceRecord> resources = Arrays.asList(
+        var resources = Arrays.asList(
             new ResourceRecord(ip)
         );
         
         // Add each host to the changes
-        List<Change> changes = new ArrayList<>();
+        var changes = new ArrayList<Change>();
         entries.forEach( (host) -> {
             ResourceRecordSet recordSet = 
                 new ResourceRecordSet(host, RRType.A);
@@ -98,11 +98,11 @@ public class Route53UpdaterRobot implements Robot
         this.zone = zone;
 
         // Create the change
-        Collection<ResourceRecord> resources = Arrays.asList(
+        var resources = Arrays.asList(
             new ResourceRecord(ip)
         );
 
-        List<Change> changes = new ArrayList<>();
+        var changes = new ArrayList<Change>();
         records.forEach( (record) -> {
             if ( alwaysUpdate || 
                  !record.getResourceRecords().contains(new ResourceRecord(ip)) )
@@ -129,16 +129,15 @@ public class Route53UpdaterRobot implements Robot
     public ChangeResourceRecordSetsResult update()
     {
         // Get a r53 client
-        AmazonRoute53 r53 = AmazonRoute53ClientBuilder
-            .standard()
-            .withRegion(this.region)
-            .build();
+        var r53 = AmazonRoute53ClientBuilder
+                    .standard()
+                    .withRegion(this.region)
+                    .build();
 
         // Change the record
-        ChangeResourceRecordSetsRequest changeRequest =
-        new ChangeResourceRecordSetsRequest()
-            .withHostedZoneId(this.zone)
-            .withChangeBatch(this.batch);
+        var changeRequest = new ChangeResourceRecordSetsRequest()
+                                    .withHostedZoneId(this.zone)
+                                    .withChangeBatch(this.batch);
         return r53.changeResourceRecordSets(changeRequest);
     }
     

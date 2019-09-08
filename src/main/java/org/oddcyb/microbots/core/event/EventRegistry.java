@@ -50,9 +50,7 @@ public class EventRegistry implements Dispatcher, Reactor
     @Override
     public void on(String id, Action action)
     {
-        Queue<Action> registered = 
-            this.register.putIfAbsent(id, getEmptyQueue());
-        
+        this.register.putIfAbsent(id, getEmptyQueue());
         this.register.get(id).add(action);
     }
     
@@ -64,9 +62,10 @@ public class EventRegistry implements Dispatcher, Reactor
     @Override
     public void dispatch(Event event)
     {
-        String id = event.getId();
-        final Object object = event.getInfo();
-        this.register.get(id).forEach( (action) -> action.perform(object) );
+        var id = event.getId();
+        this.register.get(id).forEach( (action) -> {
+            action.perform(event.getInfo());
+        });
     }
     
     /**
