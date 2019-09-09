@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, 2017 Matt Dean
+ * Copyright 2016, 2019 Matt Dean
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.oddcyb.microbots.examples.greeter;
 
 import java.util.Random;
 import org.oddcyb.microbots.Robot;
-import org.oddcyb.microbots.RobotFactory;
+import org.oddcyb.microbots.Robots;
 
 /**
  * Example of creating a robot that greets you.
@@ -37,24 +36,21 @@ public class Greeter
 
     public static void main(String[] args)
     {
-        if ( args.length < 1 )
+        if ( args.length != 1 )
         {
             usage();
-            return;
+            System.exit(1);
         }
         
         // Create some greetings for our robot
-        String[] greets = 
-            new String[] { "Hello", "Hi", "Hey", "Howdy", "Hej"};
+        var greets = new String[] { "Hello", "Hi", "Hey", "Howdy", "Hej"};
    
         // Create a robot that will greet
         Robot greeter = () ->
             System.out.println(greets[RNG.nextInt(greets.length)]+" "+args[0]);
         
-        // Activate the robot using the robot factory
-        RobotFactory.activate(greeter)
-            // Once the robot has completed it's activity, shutdown the factory
-            .activity().thenRun( () -> RobotFactory.shutdown() );
+        // Activate the robot using the robot factory and wait for it to greet
+        Robots.activate(greeter).activity().join();
     }
     
 }

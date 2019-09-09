@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, 2017 Matt Dean
+ * Copyright 2016, 2019 Matt Dean
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,35 +15,44 @@
  */
 package org.oddcyb.microbots;
 
-import org.oddcyb.microbots.core.AsyncActiveRobot;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import org.oddcyb.microbots.core.AsyncActiveRobot;
+import org.oddcyb.microbots.core.event.Event;
 import org.oddcyb.microbots.core.event.EventRegistry;
+import org.oddcyb.microbots.core.util.RobotThreadFactory;
 
 /**
  * Factory that can activate robots.
  */
 public class RobotFactory
 {
-    private static final ExecutorService EXECUTOR = 
-            Executors.newFixedThreadPool(2);
+    private final ExecutorService executor;
     
-    private static final ScheduledExecutorService SCHEDULER = 
-            Executors.newScheduledThreadPool(2);
-    
+    public RobotFactory()
+    {
+        this.executor = 
+            Executors.newCachedThreadPool(new RobotThreadFactory());
+    }
+
+    public RobotFactory(ExecutorService executors)
+    {
+        this.executor = executors;
+    }
+
     /**
      * Activate a robot.
      * 
      * @param robot the robot to activate
      * @return the activated robot
      */
-    public static ActiveRobot activate(Robot robot)
+    public ActiveRobot activate(Robot robot)
     {
-        return new AsyncActiveRobot(robot, EXECUTOR);
+        return new AsyncActiveRobot(robot, this.executor);
     }
     
     /**
@@ -55,7 +64,7 @@ public class RobotFactory
      * @param service the service to watch
      * @return ActiveRobot watching the supplied service
      */
-    public static <T> ActiveRobot newWatcher(String id, Supplier<T> service)
+    public <T> ActiveRobot newWatcher(String id, Supplier<T> service)
     {
         return activate( () -> new Event<>(id, service.get()).send() );
     }
@@ -70,8 +79,8 @@ public class RobotFactory
      * @param onService the service to watch
      * @return ActiveRobot watching the supplied service
      */
-    public static <T> ActiveRobot newWatcher(String id, 
-            Consumer<Consumer<T>> onService)
+    public <T> ActiveRobot newWatcher(String id, 
+                                      Consumer<Consumer<T>> onService)
     {
         return activate( () -> {
             onService.accept( (t) -> {
@@ -90,7 +99,7 @@ public class RobotFactory
      * @param action the action to take
      * @return ActiveRobot waiting to on
      */
-    public static <T> ActiveRobot newReactor(String id, Action<T> action)
+    public <T> ActiveRobot newReactor(String id, Action<T> action)
     {
         return activate( () -> { EventRegistry.register(id, action); } );
     }
@@ -99,17 +108,18 @@ public class RobotFactory
      * Shutdown the RobotFactory.
      * This method should be called when the RobotFactory should cease operation.
      */
-    public static void shutdown()
+    public void shutdown()
     {
-        EXECUTOR.shutdown();
+        this.executor.shutdown();
         
         try
         {
-            EXECUTOR.awaitTermination(10, TimeUnit.SECONDS);
+            this.executor.awaitTermination(10, TimeUnit.SECONDS);
         }
         catch ( InterruptedException ie )
         {
             // Interrupted while waiting
+            this.executor.shutdownNow();
         }
     }
     

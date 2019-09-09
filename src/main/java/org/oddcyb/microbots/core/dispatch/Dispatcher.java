@@ -15,7 +15,7 @@
  */
 package org.oddcyb.microbots.core.dispatch;
 
-import org.oddcyb.microbots.Event;
+import org.oddcyb.microbots.core.event.Event;
 
 /**
  * A dispatcher of events.
