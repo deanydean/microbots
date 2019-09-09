@@ -70,7 +70,8 @@ public class InternetIPDetectorRobot implements Robot
     /**
      * Pattern that can extract an IP from the URL response.
      */
-    public static final Pattern IP_EXTRACT_PATTERN = Pattern.compile(IP_EXTRACT_RE);
+    public static final Pattern IP_EXTRACT_PATTERN = 
+        Pattern.compile(IP_EXTRACT_RE, Pattern.DOTALL);
     
     private final Consumer<InetAddress> onAddress;
     private final HttpRequest request;
