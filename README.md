@@ -18,5 +18,5 @@ $ gradle install
 Once you've built the `microbots.jar`, you can run the examples like this:
 
 ```
-$ java -cp ./build/lib/microbots.jar ./src/examples/<name-of-example>.java <args>
+$ java -cp ./build/libs/microbots.jar ./src/examples/<name-of-example>.java <args>
 ```
