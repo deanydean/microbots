@@ -1,26 +1,27 @@
 //
 // Main build file for Microbots framework
-apply plugin: "java"
-apply plugin: "maven"
+plugins {
+    id 'java'
+    id 'maven-publish'
+}
 
 group = "org.oddcyb"
 version = "1.1.0-SNAPSHOT"
 
 jar {
     from {
-        configurations.compile.collect { 
+        configurations.runtimeClasspath.collect { 
             it.isDirectory() ? it : zipTree(it).matching {
-                exclude { it.path.contains("META-INF") }
-            }
-        }
-        
-        configurations.runtime.collect {
-            it.isDirectory() ? it : zipTree(it).matching {
-                exclude { it.path.contains("META-INF") }
+                exclude { 
+                    it.path.contains("META-INF/ECLIPSE_") ||
+                    it.path.contains("module-info.class") ||
+                    it.path.contains("mozilla/public-suffix-list.txt")
+                }
             }
         }
     }
-
+    
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveName = "microbots.jar"
 }
 
@@ -30,5 +31,5 @@ repositories {
 }
 
 dependencies {
-    compile "com.amazonaws:aws-java-sdk-route53:1.11.447"
+    implementation "com.amazonaws:aws-java-sdk-route53:1.11.447"
 }
